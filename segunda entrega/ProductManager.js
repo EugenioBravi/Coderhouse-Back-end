@@ -55,17 +55,6 @@ class ProductManager {
     return "Not found";
   }
   updateProduct(id, key, value) {
-    const products = this.#readFile();
-    const productIndex = products.findIndex((product) => product.id === id);
-    if (productIndex !== -1) {
-      const productUpdated = (products[productIndex][key] = value);
-      log(productUpdated);
-      this.#writeProducts(productUpdated);
-    } else {
-      return log("Product doesn't exist");
-    }
-  }
-  updateProduct(id, key, value) {
     let products = this.#readFile();
     const product = products.find((producto) => producto.id === id);
     product[key] = value;
