@@ -5,11 +5,11 @@ export async function getCart(req, res) {
   try {
     const { cid } = req.params;
     const response = await CartsService.getCart(cid);
-    let resp = response[0].products
+    let resp = response[0].products;
     res.json({
       products: resp,
     });
-    return response
+    return response;
   } catch (error) {
     res.status(400).json({
       error: error.message,
@@ -26,7 +26,7 @@ export async function createCart(req, res) {
       carts: response,
       status: STATUS.SUCCESS,
     });
-    return response
+    return response;
   } catch (error) {
     res.status(400).json({
       error: error.message,
@@ -44,7 +44,7 @@ export async function updateCart(req, res) {
       carts: response,
       status: STATUS.SUCCESS,
     });
-    return response
+    return response;
   } catch (error) {
     res.status(400).json({
       error: error.message,

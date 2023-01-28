@@ -5,4 +5,4 @@ const chatsRouter = Router();
 
 chatsRouter.get("/", ChatsController.getChats);
 
-export default chatsRouter
+export default chatsRouter;

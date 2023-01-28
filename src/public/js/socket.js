@@ -3,27 +3,19 @@ const socket = io();
 let listProducts = document.getElementById("listProducts");
 
 socket.on("upDate", (products) => {
-  listProducts.innerHTML = '';
+  listProducts.innerHTML = "";
   products.map((product) => {
-    let list = document.createElement('article');
-    let classArticle = document.createAttribute('class');
-    classArticle.value = 'card text-center text-wrap w-25 m-4 p-0 shadow-lg p-3 mb-5 bg-white rounded';
-    list.setAttributeNode(classArticle);
-    list.innerHTML =
-      `	<heder class='card-header'>
-					<h4 class='h6'>${product.title}</h4>
-				</heder>
-				<picture>
-					<img class='img-fluid img-thumbnail' src=${product.thumbnail} alt=${product.title} />
-				</picture>
-				<section class='card-body'>
-					<p class='card-text fs-6 fw-bolder'>Precio: ${product.price} usd</p>
-					<p class='card-text fs-6'>Stock disponible: ${product.stock}</p>
-				</section>
-			`;
+    const list = document.createElement("div");
+    const id = document.createAttribute("id");
+    id.value = "product";
+    list.setAttributeNode(id);
+    list.innerHTML = `
+    <img src=${product.thumbnail} alt=${product.title} />
+    <h2>${product.title}</h2>
+    <h4>${product.price} </h4>
+    <p>${product.description}</p>`;
     listProducts.appendChild(list);
   });
-
 });
 
 let name = document.getElementById("name");
@@ -34,7 +26,6 @@ let listChats = document.getElementById("listChats");
 
 let newMessages = [];
 
-
 socket.on("Welcome", (arg) => {
   newMessages = arg.messages;
   imprimirMessages(newMessages);
@@ -42,22 +33,20 @@ socket.on("Welcome", (arg) => {
 
 socket.on("loadChats", (chats) => {
   console.log(chats);
-  listChats.innerHTML = '';
+  listChats.innerHTML = "";
   chats.map((chat) => {
-    let list = document.createElement('article');
-    let classArticle = document.createAttribute('class');
-    classArticle.value = 'card text-center text-wrap shadow-lg bg-white rounded';
+    let list = document.createElement("article");
+    let classArticle = document.createAttribute("class");
+    classArticle.value =
+      "card text-center text-wrap shadow-lg bg-white rounded";
     list.setAttributeNode(classArticle);
-    list.innerHTML =
-      ` <div>
+    list.innerHTML = ` <div>
           <p id='name'>${chat.user}:  ${chat.message}</p>
         </div>
 			`;
     listChats.appendChild(list);
   });
-
 });
-
 
 let user = null;
 
@@ -81,7 +70,11 @@ submit.addEventListener("click", (e) => {
   e.preventDefault();
   const messageText = message.value.trim();
   message.value = "";
-  socket.emit("message", { user, message: messageText, date: new Date() });
+  socket.emit("message", {
+    user,
+    message: messageText,
+    date: new Date().toDateString(),
+  });
 });
 
 socket.on("message", (data) => {
@@ -104,4 +97,3 @@ socket.on("newUser", (nombre) => {
     position: "top-right",
   });
 });
-

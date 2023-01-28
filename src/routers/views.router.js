@@ -4,9 +4,10 @@ import * as ProductsService from "../dao/services/product.service.js";
 const router = Router();
 
 router.get("/", (req, res) => {
-  let products = ProductsService
-  products.getProducts()
-    .then((listProducts) => { res.render("home",  {listProducts} ) });
+  let products = ProductsService;
+  products.getProducts().then((listProducts) => {
+    res.render("home", { listProducts });
+  });
 });
 
 router.get("/realtimeproducts", (req, res) => {
@@ -18,6 +19,3 @@ router.get("/chat", (req, res) => {
 });
 
 export default router;
-
-
-

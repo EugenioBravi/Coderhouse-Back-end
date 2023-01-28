@@ -8,7 +8,7 @@ export async function getChats(req, res) {
       chats: response,
       status: STATUS.SUCCESS,
     });
-    return chats
+    return chats;
   } catch (error) {
     res.status(400).json({
       error: error.message,
@@ -25,7 +25,7 @@ export async function createChat(req, res) {
       chat: response,
       status: STATUS.SUCCESS,
     });
-    return response
+    return response;
   } catch (error) {
     res.status(400).json({
       error: error.message,
@@ -33,4 +33,3 @@ export async function createChat(req, res) {
     });
   }
 }
-
