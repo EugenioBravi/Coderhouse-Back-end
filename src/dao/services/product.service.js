@@ -2,7 +2,9 @@ import { ProductModel } from "../models/products.model.js";
 
 export async function getProducts() {
   try {
-    const products = await ProductModel.find({ deletedAt: { $exists: false } }).lean();
+    const products = await ProductModel.find({
+      deletedAt: { $exists: false },
+    }).lean();
     return products;
   } catch (error) {
     throw new Error(error.message);
@@ -11,7 +13,7 @@ export async function getProducts() {
 
 export async function getProduct(pid) {
   try {
-    const product = await ProductModel.find({pid : Number(pid)}).lean();
+    const product = await ProductModel.find({ pid: Number(pid) }).lean();
     return product;
   } catch (error) {
     throw new Error(error.message);
@@ -20,8 +22,14 @@ export async function getProduct(pid) {
 
 export async function createProducts(data) {
   try {
-    let new_pid = await ProductModel.find({}, {"_id" : 0}).sort({pid:-1}).limit(1)
-    data.pid = new_pid[0].pid + 1
+    let new_pid = await ProductModel.find({}, { _id: 0 })
+      .sort({ pid: -1 })
+      .limit(1);
+    if (new_pid.length === 0) {
+      data.pid = 0;
+    } else {
+      data.pid = new_pid[0].pid + 1;
+    }
     const product = await ProductModel.create(data);
     return product;
   } catch (error) {
@@ -31,7 +39,11 @@ export async function createProducts(data) {
 
 export async function updateProduct(pid, data) {
   try {
-    const updatedProduct = await ProductModel.findOneAndUpdate({pid : pid}, data, { new: true });
+    const updatedProduct = await ProductModel.findOneAndUpdate(
+      { pid: pid },
+      data,
+      { new: true }
+    );
     return updatedProduct;
   } catch (error) {
     throw new Error(error.message);
@@ -41,7 +53,7 @@ export async function updateProduct(pid, data) {
 export async function deleteProduct(pid) {
   try {
     const deleted = await ProductModel.deleteOne({ pid: pid });
-    return deleted
+    return deleted;
   } catch (error) {
     throw new Error(error.message);
   }

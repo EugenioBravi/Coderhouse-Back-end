@@ -15,7 +15,11 @@ export async function createCart(data) {
       .sort({ cid: -1 })
       .limit(1);
     let cart = {};
-    cart.cid = new_cid[0].cid + 1;
+    if (new_cid.length === 0) {
+      cart.cid = 0;
+    } else {
+      cart.cid = new_cid[0].cid + 1;
+    }
     cart.products = data;
     const new_cart = await CartModel.create(cart);
     return new_cart;
