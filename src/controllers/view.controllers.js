@@ -18,7 +18,6 @@ export async function getProducts(req, res) {
     for (const product of docs) {
       products.push(product._doc);
     }
-    console.log(products);
     res.render("home", {
       response,
       products,

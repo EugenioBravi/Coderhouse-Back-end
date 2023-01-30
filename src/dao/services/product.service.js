@@ -2,7 +2,6 @@ import { ProductModel } from "../models/products.model.js";
 
 export async function getProducts(limit, page, sort, query) {
   try {
-    console.log(limit, page, sort, query);
     if (sort) {
       if (sort === "asc") sort = 1;
       if (sort === "desc") sort = -1;
