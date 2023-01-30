@@ -1,15 +1,30 @@
 import * as CartsService from "../dao/services/cart.service.js";
 import { STATUS } from "../constants/constants.js";
 
+export async function getCarts(req, res) {
+  try {
+    const response = await CartsService.getCarts();
+
+    res.json({
+      carts: response,
+      status: STATUS.SUCCESS,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      status: STATUS.FAIL,
+    });
+  }
+}
 export async function getCart(req, res) {
   try {
     const { cid } = req.params;
     const response = await CartsService.getCart(cid);
-    let resp = response[0].products;
+
     res.json({
-      products: resp,
+      cart: response,
+      status: STATUS.SUCCESS,
     });
-    return response;
   } catch (error) {
     res.status(400).json({
       error: error.message,
@@ -50,13 +65,29 @@ export async function addProductToCart(req, res) {
     });
   }
 }
+export async function deleteProduct(req, res) {
+  try {
+    const { cid, pid } = req.params;
+    const response = await CartsService.deleteProduct(cid, pid);
 
-export async function deleteCart(req, res) {
+    res.json({
+      cart: response,
+      status: STATUS.SUCCESS,
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error.message,
+      status: STATUS.FAIL,
+    });
+  }
+}
+export async function deleteProducts(req, res) {
   try {
     const { cid } = req.params;
-    await CartsService.deleteCart(cid);
-    res.status(201).json({
-      message: "Carrito borrado correctamente",
+    const response = await CartsService.deleteProducts(cid);
+
+    res.json({
+      cart: response,
       status: STATUS.SUCCESS,
     });
   } catch (error) {

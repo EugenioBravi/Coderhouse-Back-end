@@ -10,7 +10,7 @@ const schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "products",
           },
-          quantity: { type: Number, default: 0 },
+          quantity: { type: Number, default: 1 },
           _id: false,
         },
       ],

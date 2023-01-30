@@ -45,7 +45,7 @@ export async function getProducts(limit, page, sort, query) {
 
 export async function getProduct(pid) {
   try {
-    const product = await ProductModel.find({ pid: Number(pid) }).lean();
+    const product = await ProductModel.find({ _id: Number(pid) }).lean();
     return product;
   } catch (error) {
     throw new Error(error.message);
@@ -64,7 +64,7 @@ export async function createProducts(data) {
 export async function updateProduct(pid, data) {
   try {
     const updatedProduct = await ProductModel.findOneAndUpdate(
-      { pid: pid },
+      { _id: pid },
       data,
       { new: true }
     );
