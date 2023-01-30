@@ -35,16 +35,14 @@ export async function createCart(req, res) {
   }
 }
 
-export async function updateCart(req, res) {
+export async function addProductToCart(req, res) {
   try {
-    const { cid } = req.params;
-    const { pid } = req.params;
-    const response = await CartsService.updateCart(cid, pid);
-    res.status(201).json({
-      carts: response,
+    const { cid, pid } = req.params;
+    const response = await CartsService.addProductToCart(cid, pid);
+    res.status(200).json({
+      user: response,
       status: STATUS.SUCCESS,
     });
-    return response;
   } catch (error) {
     res.status(400).json({
       error: error.message,
@@ -58,7 +56,7 @@ export async function deleteCart(req, res) {
     const { cid } = req.params;
     await CartsService.deleteCart(cid);
     res.status(201).json({
-      message: "Carto borrado correctamente",
+      message: "Carrito borrado correctamente",
       status: STATUS.SUCCESS,
     });
   } catch (error) {

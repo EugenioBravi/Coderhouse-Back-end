@@ -1,14 +1,8 @@
 import { Router } from "express";
-import * as ProductsService from "../dao/services/product.service.js";
+import * as ViewsController from "../controllers/view.controllers.js";
 
 const router = Router();
-
-router.get("/", (req, res) => {
-  let products = ProductsService;
-  products.getProducts().then((listProducts) => {
-    res.render("home", { listProducts });
-  });
-});
+router.get("/", ViewsController.getProducts);
 
 router.get("/realtimeproducts", (req, res) => {
   res.render("realTimeProducts");

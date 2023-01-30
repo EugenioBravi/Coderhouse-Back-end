@@ -1,15 +1,20 @@
-import mongoose from "mongoose";
+import { mongoose, Schema } from "mongoose";
 import mongooseDelete from "mongoose-delete";
 
-const schema = new mongoose.Schema(
+const schema = new Schema(
   {
-    cid: {
-      type: Number,
-      required: false,
-    },
     products: {
-      type: Array,
-      required: true,
+      type: [
+        {
+          product: {
+            type: Schema.Types.ObjectId,
+            ref: "products",
+          },
+          quantity: { type: Number, default: 0 },
+          _id: false,
+        },
+      ],
+      default: [],
     },
   },
   {

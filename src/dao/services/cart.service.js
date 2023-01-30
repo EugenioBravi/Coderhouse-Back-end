@@ -2,60 +2,93 @@ import { CartModel } from "../models/cart.model.js";
 
 export async function getCart(cid) {
   try {
-    const cart = await CartModel.find({ cid: Number(cid) });
+    const cart = await CartModel.findById(cid).populate("products.producto");
+    return cart;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+export async function createCart(data) {
+  try {
+    const cart = await CartModel.create(data);
     return cart;
   } catch (error) {
     throw new Error(error.message);
   }
 }
 
-export async function createCart(data) {
+export async function addProductToCart(cid, pid) {
   try {
-    let new_cid = await CartModel.find({}, { _id: 0 })
-      .sort({ cid: -1 })
-      .limit(1);
-    let cart = {};
-    if (new_cid.length === 0) {
-      cart.cid = 0;
-    } else {
-      cart.cid = new_cid[0].cid + 1;
-    }
-    cart.products = data;
-    const new_cart = await CartModel.create(cart);
-    return new_cart;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-}
-
-export async function updateCart(cid, pid) {
-  try {
-    const updatedCart = await CartModel.find({ cid: cid });
-    let products = updatedCart[0].products;
-    let control = false;
-    products.map((product) => {
-      if (product.id == pid) {
-        product.quantity += 1;
-        control = true;
+    const cart = await CartModel.findById(cid);
+    const products = cart.products;
+    let exist = false;
+    let quantity = 1;
+    for (let product of products) {
+      const productId = product.producto;
+      if (productId === pid) {
+        exist = true;
+        quantity = product.quantity + 1;
       }
-    });
-    if (!control) {
-      products.push({ id: Number(pid), quantity: 1 });
     }
-    const redyUpdatedCart = await CartModel.findOneAndUpdate(
-      { cid: cid },
-      { products: products }
-    );
-    return redyUpdatedCart;
+    if (exist) {
+      await CartModel.findOneAndUpdate(
+        { _id: cid, products: { $elemMatch: { producto: pid } } },
+        { $set: { "products.$.quantity": quantity } },
+        { new: true }
+      );
+      return "Cantidad incrementada";
+    } else {
+      cart.products.push({ producto: pid, quantity: quantity });
+      cart.save();
+      return "Producto agregado";
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+export async function updateProductQty(cartId, productId, quantity) {
+  try {
+    const cart = await CartModel.findById(cartId);
+    if (cart) {
+      const productToUpdate = cart.products.find(
+        (product) => product.product == productId
+      );
+      if (productToUpdate) {
+        productToUpdate.quantity = quantity;
+      } else {
+        cart.products.push({ product: productId, quantity: quantity });
+      }
+      await CartModel.findByIdAndUpdate(cartId, cart, { new: true });
+    }
+    return cart;
   } catch (error) {
     throw new Error(error.message);
   }
 }
 
-export async function deleteCart(cid) {
+export async function deleteProduct(cartId, productId) {
   try {
-    const deleted = await CartModel.deleteOne({ cid: cid });
-    return deleted;
+    const cart = await CartModel.findById(cartId);
+    if (cart) {
+      cart.products = cart.products.filter(
+        (product) => product.product != productId
+      );
+      await CartModel.findByIdAndUpdate(cartId, cart, { new: true });
+    }
+    return cart;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function deleteProducts(cartId) {
+  try {
+    const cart = await CartModel.findById(cartId);
+    if (cart) {
+      cart.products = [];
+      await CartModel.findByIdAndUpdate(cartId, cart, { new: true });
+    }
+    return cart;
   } catch (error) {
     throw new Error(error.message);
   }

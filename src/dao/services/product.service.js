@@ -1,11 +1,44 @@
 import { ProductModel } from "../models/products.model.js";
 
-export async function getProducts() {
+export async function getProducts(limit, page, sort, query) {
   try {
-    const products = await ProductModel.find({
-      deletedAt: { $exists: false },
-    }).lean();
-    return products;
+    console.log(limit, page, sort, query);
+    if (sort) {
+      if (sort === "asc") sort = 1;
+      if (sort === "desc") sort = -1;
+    }
+    let valores = {};
+    if (query) {
+      valores = {
+        deletedAt: { $exists: false },
+        category: query,
+      };
+    } else {
+      valores = { deletedAt: { $exists: false } };
+    }
+
+    const products = await ProductModel.find(valores)
+      .limit(limit)
+      .skip(page !== 1 ? (page - 1) * limit : 0)
+      .sort({ price: sort });
+    const pages = Math.ceil(
+      (await ProductModel.countDocuments(valores)) / limit
+    );
+    const prevPage = page - 1;
+    const nextPage = page + 1;
+    const hasPrevPage = prevPage <= 0 ? false : true;
+    const hasNextPage = nextPage > pages ? false : true;
+
+    const respuesta = {
+      status: "succes",
+      payload: products,
+      totalPages: pages,
+      prevPage: prevPage,
+      nextPage: nextPage,
+      hasPrevPage: hasPrevPage,
+      hasNextPage: hasNextPage,
+    };
+    return respuesta;
   } catch (error) {
     throw new Error(error.message);
   }
@@ -22,14 +55,6 @@ export async function getProduct(pid) {
 
 export async function createProducts(data) {
   try {
-    let new_pid = await ProductModel.find({}, { _id: 0 })
-      .sort({ pid: -1 })
-      .limit(1);
-    if (new_pid.length === 0) {
-      data.pid = 0;
-    } else {
-      data.pid = new_pid[0].pid + 1;
-    }
     const product = await ProductModel.create(data);
     return product;
   } catch (error) {
@@ -52,7 +77,7 @@ export async function updateProduct(pid, data) {
 
 export async function deleteProduct(pid) {
   try {
-    const deleted = await ProductModel.deleteOne({ pid: pid });
+    const deleted = await ProductModel.deleteOne({ _id: pid });
     return deleted;
   } catch (error) {
     throw new Error(error.message);

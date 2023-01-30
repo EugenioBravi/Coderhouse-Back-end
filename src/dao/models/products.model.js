@@ -39,10 +39,6 @@ const schema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    pid: {
-      type: Number,
-      required: false,
-    },
   },
   {
     timestamps: true,
