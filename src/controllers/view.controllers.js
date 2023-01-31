@@ -52,7 +52,6 @@ export async function getProducts(req, res) {
     };
     const docs = response.payload;
     const products = [];
-    console.log(pageData);
     for (const product of docs) {
       products.push(product._doc);
     }
