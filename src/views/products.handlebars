@@ -1,0 +1,38 @@
+<h1>LISTA DE PRODUCTOS</h1>
+<div class="container" id="listProducts">
+  {{#each products}}
+    <div class="card" style="width: 18rem;">
+      <img class="card-img-top" src={{thumbnail}} alt={{title}} />
+      <h2 class="card-title">{{title}} </h2>
+      <h4 class="card-text">${{price}} </h4>
+      <p class="card-text">{{description}} </p>
+      <p class="card-text" id="_id">{{_id}}</p>
+      <a class="btn btn-primary" href="#" id={{_id}}>Agregar al Carrito</a>
+    </div>
+  {{/each}}
+</div>
+<div class="container-fluid">
+  {{#if pageData.hasPrevPage}}
+    <a
+      class="btn btn-primary stretched-link"
+      href="/products/?page={{pageData.prevPage}}"
+    >Anterior</a>
+  {{/if}}
+  <p>
+    Pagina actual:
+    {{pageData.page}}
+  </p>
+  {{#if pageData.hasNextPage}}
+    <a
+      class="btn btn-primary stretched-link"
+      href="/products/?page={{pageData.nextPage}}"
+    >Siguiente</a>
+  {{/if}}
+</div>
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<script>
+  $(".container").ready(function () { $(".card").on("click", ".btn", function
+  (e) { e.preventDefault();
+  fetch(`http://localhost:8080/api/carts/0/product/${e.target.id}`, { method:
+  'POST' }) .then(res => res.json()) .then(data => console.log(data)) }); });
+</script>

@@ -13,7 +13,8 @@ socket.on("upDate", (products) => {
     <img src=${product.thumbnail} alt=${product.title} />
     <h2>${product.title}</h2>
     <h4>${product.price} </h4>
-    <p>${product.description}</p>`;
+    <p>${product.description}</p>
+    <p>${product._id}</p>`;
     listProducts.appendChild(list);
   });
 });

@@ -40,6 +40,20 @@ export async function addProductToCart(cid, pid) {
         cart.products.push({ product: pid });
       }
       await CartModel.findByIdAndUpdate(cid, cart, { new: true });
+    } else {
+      const newCart = {
+        _id: cid,
+        products: [
+          {
+            product: {
+              _id: pid,
+            },
+            quantity: 1,
+          },
+        ],
+      };
+      await createCart(newCart);
+      return newCart;
     }
     return cart;
   } catch (error) {

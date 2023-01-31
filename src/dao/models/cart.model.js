@@ -3,6 +3,12 @@ import mongooseDelete from "mongoose-delete";
 
 const schema = new Schema(
   {
+    _id: {
+      type: String,
+      required: false,
+      unique: true,
+      default: mongoose.Types.ObjectId,
+    },
     products: {
       type: [
         {

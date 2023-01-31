@@ -23,6 +23,7 @@ export async function getProducts(limit, page, sort, query) {
     const pages = Math.ceil(
       (await ProductModel.countDocuments(valores)) / limit
     );
+    const actualPage = page;
     const prevPage = page - 1;
     const nextPage = page + 1;
     const hasPrevPage = prevPage <= 0 ? false : true;
@@ -32,6 +33,7 @@ export async function getProducts(limit, page, sort, query) {
       status: "succes",
       payload: products,
       totalPages: pages,
+      page: actualPage,
       prevPage: prevPage,
       nextPage: nextPage,
       hasPrevPage: hasPrevPage,
