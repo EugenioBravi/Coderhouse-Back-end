@@ -1,6 +1,29 @@
 import * as ProductsService from "../dao/services/product.service.js";
 import * as cartsService from "../dao/services/cart.service.js";
 import { STATUS } from "../constants/constants.js";
+
+export const login = async (req, res) => {
+  try {
+    res.render("login", {});
+  } catch (error) {
+    res.status(500).json({
+      success: STATUS.FAIL,
+      message: error.message,
+    });
+  }
+};
+
+export const register = async (req, res) => {
+  try {
+    res.render("register", {});
+  } catch (error) {
+    res.status(500).json({
+      success: STATUS.FAIL,
+      message: error.message,
+    });
+  }
+};
+
 export async function getHomeProducts(req, res) {
   try {
     let limit = req.query.limit || 10;
