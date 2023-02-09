@@ -43,6 +43,7 @@ export async function getHomeProducts(req, res) {
       products.push(product._doc);
     }
     res.render("home", {
+      user: req.session.user,
       response,
       products,
     });
@@ -79,6 +80,7 @@ export async function getProducts(req, res) {
       products.push(product._doc);
     }
     res.render("products", {
+      user: req.session.user,
       pageData,
       products,
     });
