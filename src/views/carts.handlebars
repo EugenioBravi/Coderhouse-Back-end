@@ -1,13 +1,10 @@
-<h1>Carrito</h1>
-<div class="container" id="listProducts">
-  {{#each cart}}
-    <div class="card" style="width: 18rem;">
-      <img class="card-img-top" src={{thumbnail}} alt={{title}} />
-      <h2 class="card-title">{{title}} </h2>
-      <h4 class="card-text">${{price}} </h4>
-      <p class="card-text">{{description}} </p>
-      <p class="card-text" id="_id">{{_id}}</p>
-      <p class="card-text">cantidad: {{quantity}}</p>
-    </div>
+<h1>Cart: {{_id}}</h1>
+
+<h2>Products list</h2>
+<ul>
+  {{#each items as |item|}}
+    <li>product: {{item.product}}</li>
+    <li>quantity: {{item.quantity}}</li>
   {{/each}}
-</div>
+</ul>
+

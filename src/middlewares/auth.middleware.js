@@ -1,17 +1,33 @@
-import { STATUS } from "../constants/constants.js";
+import { STATUS } from '../constants/constants.js'
 
 export const authMiddleware = (req, res, next) => {
   try {
     if (req.session.logged) {
-      req.session.touch();
-      next();
+      req.session.touch()
+      next()
     } else {
-      res.redirect("/login");
+      res.redirect('/login')
     }
   } catch (error) {
-    res.status(500).json({
+    res.status(403).json({
       success: STATUS.FAIL,
-      message: error.message,
-    });
+      message: error.message
+    })
   }
-};
+}
+
+export const checkSession = (req, res, next) => {
+  try {
+    if (req.session.logged) {
+      req.session.touch()
+      next()
+    } else {
+      throw new Error('User not logged')
+    }
+  } catch (error) {
+    res.status(403).json({
+      success: STATUS.FAIL,
+      message: error.message
+    })
+  }
+}
