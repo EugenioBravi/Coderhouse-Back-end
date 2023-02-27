@@ -1,7 +1,8 @@
+<h1>Products List</h1>
 
-<h1>Real Time Products List</h1>
+<h2>Wellcome: {{user.firstName}} {{user.lastName}} (role: {{user.role}})</h2>
 
-<ul id="productsList">
+<ul>
   {{#each products as |product|}}
     <li>id: {{product._id}}</li>
     <ul>
@@ -17,6 +18,6 @@
   {{/each}}
 </ul>
 
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/realTimeProducts.js"></script>
+<form action="http://localhost:3000/api/auth/logout" method="get">
+  <button type="submit">Logout</button>
+</form>

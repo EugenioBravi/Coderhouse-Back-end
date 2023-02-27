@@ -1,95 +1,128 @@
-import * as ProductsService from "../dao/services/product.service.js";
-import { STATUS } from "../constants/constants.js";
+import { STATUS } from '../constants/constants.js'
+import productManagerDB from '../services/products.mongo.services.js'
 
-export async function getProducts(req, res) {
+export const getProducts = async (req, res) => {
   try {
-    let limit = req.query.limit || 10;
-    let page = Number(req.query.page) || 1;
-    let sort = req.query.sort;
-    let query = req.query.query;
 
-    const response = await ProductsService.getProducts(
-      limit,
-      page,
-      sort,
-      query
-    );
-    res.json({
-      query,
-      user: response,
+    const { products, metadata } = await productManagerDB.getProducts(req.query)
+
+    res.status(200).json({
       status: STATUS.SUCCESS,
-    });
+      payload: products,
+      ...metadata
+    })
+
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
+    res.status(500).json({
       status: STATUS.FAIL,
-    });
-  }
-}
-export async function getProduct(req, res) {
-  try {
-    const { pid } = req.params;
-    const response = await ProductsService.getProduct(pid);
-    res.json({
-      products: response,
-      status: STATUS.SUCCESS,
-    });
-    return response;
-  } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
+      message: error.message
+    })
   }
 }
 
-export async function createProducts(req, res) {
+export const getproductById = async (req, res) => {
   try {
-    const { body } = req;
-    const response = await ProductsService.createProducts(body);
+    let { pid } = req.params
+
+    if (pid) {
+
+      // const foundedProduct = await productManagerFs.getproductById(Number(pid))
+      const foundedProduct = await productManagerDB.getProductById(pid)
+      res.status(200).json({
+        success: true,
+        product: foundedProduct
+      })
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Bad or missing product ID'
+      })
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      status: STATUS.FAIL,
+      message: error.message
+    })
+  }
+}
+
+export const postProduct = async (req, res) => {
+  try {
+    const product = req.body
+
+    // Save on MongoDB
+    const savedProduct = await productManagerDB.createProduct(product)
+    // Save on file
+    // await productManagerFs.addProduct(createdProduct)
+
+    // Send update over ws
+    // const productsList = await productManagerFs.getProducts()
+    const productsList = await productManagerDB.getProducts()
+    req.io.emit('products', productsList)
+
     res.status(201).json({
-      products: response,
-      status: STATUS.SUCCESS,
-    });
-    return response;
+      success: true,
+      message: 'Product creation OK',
+      product: savedProduct
+    })
+
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
+    res.status(500).json({
       status: STATUS.FAIL,
-    });
+      message: error.message
+    })
   }
 }
 
-export async function updateProduct(req, res) {
+export const updateProduct = async (req, res) => {
   try {
-    const { pid } = req.params;
-    const { body } = req;
-    const response = await ProductsService.updateProduct(pid, body);
-    res.status(201).json({
-      products: response,
-      status: STATUS.SUCCESS,
-    });
-    return response;
+
+    const pid = req.params.pid
+    const data = req.body
+
+    const updatedProduct = await productManagerDB.updateProduct(pid, data)
+
+    // Send update over ws
+    const productsList = await productManagerDB.getProducts()
+    req.io.emit('products', productsList)
+
+    res.status(200).json({
+      success: true,
+      message: `Product Id = ${req.params.pid} successfully updated`,
+      updatedProduct: updatedProduct
+    })
+
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
+    res.status(500).json({
       status: STATUS.FAIL,
-    });
+      message: error.message
+    })
   }
 }
 
-export async function deleteProduct(req, res) {
+export const deleteProductById = async (req, res) => {
   try {
-    const { pid } = req.params;
-    await ProductsService.deleteProduct(pid);
-    res.status(201).json({
-      message: "Producto borrado correctamente",
-      status: STATUS.SUCCESS,
-    });
+
+    const { pid } = req.params
+    // Delete on DB
+    await productManagerDB.deleteProduct(pid)
+    // Delete on file
+    // await productManagerFs.deleteProduct(Number(pid))
+
+    // Get products from DB and send over ws
+    const productsList = await productManagerDB.getProducts()
+    req.io.emit('products', productsList)
+
+    res.status(200).json({
+      success: true,
+      message: `Product Id = ${req.params.pid} successfully deleted`
+    })
+
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
+    res.status(500).json({
       status: STATUS.FAIL,
-    });
+      message: error.message
+    })
   }
 }

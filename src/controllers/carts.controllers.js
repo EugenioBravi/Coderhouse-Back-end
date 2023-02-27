@@ -1,99 +1,117 @@
-import * as CartsService from "../dao/services/cart.service.js";
-import { STATUS } from "../constants/constants.js";
+import { STATUS } from '../constants/constants.js'
+import cartManagerDB from '../services/carts.mongo.services.js'
 
-export async function getCarts(req, res) {
+export const postCart = async (req, res) => {
   try {
-    const response = await CartsService.getCarts();
 
-    res.json({
-      carts: response,
-      status: STATUS.SUCCESS,
-    });
+    const createdCart = await cartManagerDB.createCart()
+
+    res.status(201).json({
+      success: STATUS.SUCCESS,
+      createdCart: createdCart,
+      message: 'Cart created OK'
+    })
+
   } catch (error) {
     res.status(500).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
-  }
-}
-export async function getCart(req, res) {
-  try {
-    const { cid } = req.params;
-    const response = await CartsService.getCart(cid);
-
-    res.json({
-      cart: response,
-      status: STATUS.SUCCESS,
-    });
-  } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
+      success: STATUS.FAIL,
+      message: error.message
+    })
   }
 }
 
-export async function createCart(req, res) {
+export const addProductToCart = async (req, res) => {
   try {
-    const { body } = req;
-    const response = await CartsService.createCart(body);
+    let { cid, pid } = req.params
+    let { quantity } = req.body
+
+    if (quantity) {
+      await cartManagerDB.addProductToCart(cid, pid, quantity)
+    } else {
+      res.status(401).json({
+        success: STATUS.FAIL,
+        message: 'quantity param is required'
+      })
+    }
+
     res.status(201).json({
-      carts: response,
-      status: STATUS.SUCCESS,
-    });
-    return response;
+      success: STATUS.SUCCESS,
+      message: 'Product added to cart OK'
+    })
+
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
+    res.status(500).json({
+      success: STATUS.FAIL,
+      message: error.message
+    })
   }
 }
 
-export async function addProductToCart(req, res) {
+export const addProductsToCart = async (req, res) => {
   try {
-    const { cid, pid } = req.params;
-    const response = await CartsService.addProductToCart(cid, pid);
+    let { cid } = req.params
+    let { items } = req.body
+
+    if (items && cid) {
+      const updatedCart = await cartManagerDB.addProductsToCart(cid, items)
+
+      res.status(201).json({
+        success: STATUS.SUCCESS,
+        message: 'Product added to cart OK',
+        updatedCart: updatedCart
+      })
+
+    } else {
+      res.status(401).json({
+        success: STATUS.FAIL,
+        message: 'bad or missing request params'
+      })
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      success: STATUS.FAIL,
+      message: error.message
+    })
+  }
+}
+
+export const deleteProductToCart = async (req, res) => {
+  try {
+    let { cid, pid } = req.params
+
+    // Check if product id exist
+    const updatedCart = await cartManagerDB.deleteProductToCart(cid, pid)
+
+    res.status(201).json({
+      success: STATUS.SUCCESS,
+      updatedCart: updatedCart,
+      message: 'Product deleted to cart OK'
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      success: STATUS.FAIL,
+      message: error.message
+    })
+  }
+}
+
+export const getProductsByCartId = async (req, res) => {
+  try {
+    const cid = req.params.cid
+
+    const products = await cartManagerDB.getProductsByCartId(cid)
+
     res.status(200).json({
-      user: response,
-      status: STATUS.SUCCESS,
-    });
-  } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
-  }
-}
-export async function deleteProduct(req, res) {
-  try {
-    const { cid, pid } = req.params;
-    const response = await CartsService.deleteProduct(cid, pid);
+      success: STATUS.SUCCESS,
+      products
+    })
 
-    res.json({
-      cart: response,
-      status: STATUS.SUCCESS,
-    });
   } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
-  }
-}
-export async function deleteProducts(req, res) {
-  try {
-    const { cid } = req.params;
-    const response = await CartsService.deleteProducts(cid);
-
-    res.json({
-      cart: response,
-      status: STATUS.SUCCESS,
-    });
-  } catch (error) {
-    res.status(400).json({
-      error: error.message,
-      status: STATUS.FAIL,
-    });
+    res.status(500).json({
+      success: STATUS.FAIL,
+      message: error.message
+    })
   }
 }
